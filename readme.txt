@@ -1,0 +1,66 @@
+=== HDWebmobile Booking & Appointments ===
+Contributors: htrxuan
+Donate link: https://paypal.me/htrxuan/20
+Tags: woocommerce, booking, appointments, scheduling, reservations
+Requires at least: 6.9
+Tested up to: 7.1
+Requires PHP: 7.4
+Stable tag: 1.0.0
+Requires Plugins: woocommerce
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+Sell bookable services and appointments through WooCommerce, with a per-slot capacity that can never be oversold.
+
+== Description ==
+
+HDWebmobile Booking & Appointments turns any simple WooCommerce product into a bookable service. Customers pick an available date and time slot on the product page; the booking is confirmed the moment their order completes, and they can view or cancel it later under My Account.
+
+= Why this plugin exists =
+A competing booking plugin (Amelia) had an authenticated IDOR/mass-assignment vulnerability (CVE-2026-2931, CVSS 8.8): its "update my booking profile" endpoint accepted a client-supplied field linking the booking record to a WordPress user id, with no check that it still pointed at the requester's own account -- letting a low-privileged customer reset the password of *any* WordPress user, including an administrator. This plugin closes that vulnerability class by construction:
+
+* A booking's owner is written in exactly one place -- at order completion, from the order's own customer id -- and never again. There is no "update booking" code path anywhere in this plugin that accepts a customer id, user id, or any similar field from a request.
+* This plugin never touches a WordPress password. There is no code path here that calls `wp_set_password()` or anything like it, at all -- a customer's password remains entirely WordPress core's own Account Details screen.
+* A customer can only ever see or cancel their own bookings, scoped by their logged-in account at the database query itself -- never by an id taken from the request.
+* Per-slot capacity is enforced with an atomic, race-condition-safe claim (a database uniqueness constraint), so two customers can never both be confirmed into the same slot beyond its configured capacity.
+
+= Key Features =
+* Turn any simple product into a bookable service from its own Product Data > Booking tab
+* Configurable available days, time slots, lead time, and how many days ahead to offer
+* Per-slot capacity -- a slot stops being offered once it's full
+* Booking is confirmed automatically when the order is marked Completed
+* A "Bookings" tab under My Account to view and cancel upcoming bookings
+* If a slot fills up between add-to-cart and checkout, the order still completes normally and the admin is emailed to help reschedule -- no booking is ever double-booked
+
+= Limitations (please read before installing) =
+* Simple products only in this version -- no variable-product support
+* No staff/resource assignment -- a slot's capacity is a single shared number, not per-staff-member
+* No calendar sync (Google Calendar, iCal, etc.) in this version
+
+== Installation ==
+
+1. Upload the plugin files to the `/wp-content/plugins/hdwebmobile-booking-appointments` directory, or install the plugin through the WordPress plugins screen directly.
+2. Activate the plugin through the 'Plugins' screen in WordPress. WooCommerce must already be installed and active.
+3. Edit a simple product, open its new "Booking" tab under Product Data, and configure availability.
+
+== How to Use ==
+
+= 1. Configure a bookable product =
+On a simple product's "Booking" tab, check "Bookable service", set available days, time slots (one per line), lead time, and capacity per slot.
+
+= 2. Customer books =
+On the product page, the customer picks a date and time slot before adding to cart -- exactly like any other WooCommerce purchase.
+
+= 3. Booking confirmed =
+Once the order is marked Completed, the booking is confirmed and appears under the customer's My Account > Bookings, where they can cancel it if needed.
+
+== Screenshots ==
+
+1. The "Booking" tab on a product, with availability and capacity settings.
+2. The date/time picker on a product page.
+3. The Bookings list under WooCommerce > HDWebmobile.
+
+== Changelog ==
+
+= 1.0.0 =
+* Initial release: per-product availability and capacity, atomic slot claiming on order completion, "Bookings" My Account tab with cancellation, shortage handling with admin notification.
