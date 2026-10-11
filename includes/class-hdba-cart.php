@@ -54,6 +54,8 @@ final class HDBA_Cart
         $dates = HDBA_Availability::get_valid_dates($product->get_id());
         $slots = HDBA_Availability::get_time_slots($product->get_id());
 
+        wp_nonce_field('hdba_add_to_cart', 'hdba_add_to_cart_nonce');
+
         echo '<div class="hdba-booking-fields">';
         printf('<p><label for="hdba_booking_date">%s</label><br /><select id="hdba_booking_date" name="hdba_booking_date" required>', esc_html__('Appointment date', 'hdwebmobile-booking-appointments'));
         echo '<option value="">' . esc_html__('Select a date', 'hdwebmobile-booking-appointments') . '</option>';
@@ -78,10 +80,7 @@ final class HDBA_Cart
             return $passed;
         }
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce's own add-to-cart nonce/session flow is verified upstream (WC_Form_Handler / Store API CartController) before this filter fires; the date/slot values themselves are validated against HDBA_Availability below, not trusted as-is.
-        $date = isset($_POST['hdba_booking_date']) ? sanitize_text_field(wp_unslash($_POST['hdba_booking_date'])) : '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- see above.
-        $slot = isset($_POST['hdba_time_slot']) ? sanitize_text_field(wp_unslash($_POST['hdba_time_slot'])) : '';
+        list($date, $slot) = self::get_submitted_date_slot();
 
         if (!HDBA_Availability::is_valid_date($product_id, $date) || !HDBA_Availability::is_valid_slot($product_id, $slot)) {
             wc_add_notice(__('Please choose a valid appointment date and time slot.', 'hdwebmobile-booking-appointments'), 'error');
@@ -103,10 +102,7 @@ final class HDBA_Cart
             return $cart_item_data;
         }
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- same upstream nonce coverage as validate_add_to_cart() above; values are re-validated against HDBA_Availability at order-completion time in class-hdba-order.php, never trusted as-is.
-        $date = isset($_POST['hdba_booking_date']) ? sanitize_text_field(wp_unslash($_POST['hdba_booking_date'])) : '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- see above.
-        $slot = isset($_POST['hdba_time_slot']) ? sanitize_text_field(wp_unslash($_POST['hdba_time_slot'])) : '';
+        list($date, $slot) = self::get_submitted_date_slot();
 
         if ($date && $slot) {
             $cart_item_data['hdba_booking_date'] = $date;
@@ -114,6 +110,26 @@ final class HDBA_Cart
         }
 
         return $cart_item_data;
+    }
+
+    /**
+     * Reads the posted date/slot only when accompanied by our own nonce (rendered by
+     * render_fields() above); otherwise returns empty strings, so a forged/missing-nonce
+     * submission fails is_valid_date()/is_valid_slot() exactly as if left blank.
+     */
+    private static function get_submitted_date_slot()
+    {
+        if (
+            !isset($_POST['hdba_add_to_cart_nonce'])
+            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['hdba_add_to_cart_nonce'])), 'hdba_add_to_cart')
+        ) {
+            return array('', '');
+        }
+
+        $date = isset($_POST['hdba_booking_date']) ? sanitize_text_field(wp_unslash($_POST['hdba_booking_date'])) : '';
+        $slot = isset($_POST['hdba_time_slot']) ? sanitize_text_field(wp_unslash($_POST['hdba_time_slot'])) : '';
+
+        return array($date, $slot);
     }
 
     public function get_item_data($item_data, $cart_item)
