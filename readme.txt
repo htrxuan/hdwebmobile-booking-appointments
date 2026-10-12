@@ -16,8 +16,8 @@ Sell bookable services and appointments through WooCommerce, with a per-slot cap
 
 HDWebmobile Booking & Appointments turns any simple WooCommerce product into a bookable service. Customers pick an available date and time slot on the product page; the booking is confirmed the moment their order completes, and they can view or cancel it later under My Account.
 
-= Why this plugin exists =
-A competing booking plugin (Amelia) had an authenticated IDOR/mass-assignment vulnerability (CVE-2026-2931, CVSS 8.8): its "update my booking profile" endpoint accepted a client-supplied field linking the booking record to a WordPress user id, with no check that it still pointed at the requester's own account -- letting a low-privileged customer reset the password of *any* WordPress user, including an administrator. This plugin closes that vulnerability class by construction:
+= Security by design =
+A serious class of bug in booking tools is an "update my booking profile" endpoint that accepts a client-supplied field linking the booking record to a WordPress user id, with no check that it still points at the requester's own account (an IDOR / mass-assignment flaw) -- which can let a low-privileged customer reset the password of *any* WordPress user, including an administrator. This plugin closes that vulnerability class by construction:
 
 * A booking's owner is written in exactly one place -- at order completion, from the order's own customer id -- and never again. There is no "update booking" code path anywhere in this plugin that accepts a customer id, user id, or any similar field from a request.
 * This plugin never touches a WordPress password. There is no code path here that calls `wp_set_password()` or anything like it, at all -- a customer's password remains entirely WordPress core's own Account Details screen.
