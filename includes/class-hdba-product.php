@@ -72,19 +72,27 @@ final class HDBA_Product
                     <label for="hdba_days_ahead"><?php esc_html_e('Days ahead to offer', 'hdwebmobile-booking-appointments'); ?></label>
                     <input type="number" min="1" id="hdba_days_ahead" name="hdba_days_ahead" value="<?php echo esc_attr($settings['days_ahead']); ?>" class="short" />
                 </p>
-                <p class="form-field">
-                    <label><?php esc_html_e('Available days', 'hdwebmobile-booking-appointments'); ?></label>
-                    <?php foreach ($weekdays as $value => $label) : ?>
-                        <label style="margin-right:10px;display:inline-block;">
-                            <input type="checkbox" name="hdba_available_days[]" value="<?php echo esc_attr($value); ?>" <?php checked(in_array($value, $settings['available_days'], true)); ?> />
-                            <?php echo esc_html($label); ?>
-                        </label>
-                    <?php endforeach; ?>
-                    <span class="description"><?php esc_html_e('Leave all unchecked to allow every day.', 'hdwebmobile-booking-appointments'); ?></span>
-                </p>
+                <?php
+                // WooCommerce's panel CSS floats every <label> into the left column, so a row of
+                // per-day checkbox labels must use its own fieldset/legend + ul.wc-radios pattern.
+                ?>
+                <fieldset class="form-field">
+                    <legend><?php esc_html_e('Available days', 'hdwebmobile-booking-appointments'); ?></legend>
+                    <ul class="wc-radios">
+                        <?php foreach ($weekdays as $value => $label) : ?>
+                            <li style="display:inline-block;margin-right:14px;">
+                                <label>
+                                    <input type="checkbox" name="hdba_available_days[]" value="<?php echo esc_attr($value); ?>" <?php checked(in_array($value, $settings['available_days'], true)); ?> />
+                                    <?php echo esc_html($label); ?>
+                                </label>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <span class="description" style="display:block;clear:both;"><?php esc_html_e('Leave all unchecked to allow every day.', 'hdwebmobile-booking-appointments'); ?></span>
+                </fieldset>
                 <p class="form-field">
                     <label for="hdba_time_slots"><?php esc_html_e('Time slots', 'hdwebmobile-booking-appointments'); ?></label>
-                    <textarea id="hdba_time_slots" name="hdba_time_slots" rows="4" style="width:50%;"><?php echo esc_textarea(implode("\n", $settings['time_slots'])); ?></textarea>
+                    <textarea id="hdba_time_slots" name="hdba_time_slots" rows="5" style="width:50%;height:8em;"><?php echo esc_textarea(implode("\n", $settings['time_slots'])); ?></textarea>
                     <span class="description"><?php esc_html_e('One time slot per line (e.g. "9:00 AM - 10:00 AM").', 'hdwebmobile-booking-appointments'); ?></span>
                 </p>
                 <p class="form-field">
