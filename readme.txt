@@ -37,6 +37,9 @@ A serious class of bug in booking tools is an "update my booking profile" endpoi
 * No staff/resource assignment -- a slot's capacity is a single shared number, not per-staff-member
 * No calendar sync (Google Calendar, iCal, etc.) in this version
 
+= Enjoying this plugin? =
+If it helps your site, please consider [leaving an honest review on WordPress.org](https://wordpress.org/support/plugin/hdwebmobile-booking-appointments/reviews/#new-post) -- it helps other WordPress users find it. Found a problem or have an idea? Please [open a support topic](https://wordpress.org/support/plugin/hdwebmobile-booking-appointments/) first so it can be fixed.
+
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/hdwebmobile-booking-appointments` directory, or install the plugin through the WordPress plugins screen directly.
