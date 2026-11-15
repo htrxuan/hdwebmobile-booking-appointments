@@ -4,7 +4,7 @@
  * Plugin Name: HDWebmobile Booking & Appointments
  * Plugin URI: https://hdwebmobile.com/plugins/hdwebmobile-booking-appointments/
  * Description: Sell bookable services and appointments through WooCommerce. A booking's owner is set exactly once, server-side, at purchase and never accepted from any later request -- and this plugin never touches a WordPress password.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: htrxuan - Han Tran
  * Author URI: https://hdwebmobile.com/
  * License: GPLv2 or later
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define Constants
-define('HDBA_VERSION', '1.0.0');
+define('HDBA_VERSION', '1.0.1');
 define('HDBA_DB_VERSION', '1.0.0');
 define('HDBA_PLUGIN_FILE', __FILE__);
 define('HDBA_PLUGIN_DIR', plugin_dir_path(__FILE__));
