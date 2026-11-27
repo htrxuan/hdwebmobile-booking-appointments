@@ -12,7 +12,7 @@ HDWebmobile Booking & Appointments turns any simple WooCommerce product into a b
 
 ## Why this plugin exists
 
-A competing booking plugin (Amelia) had an authenticated IDOR/mass-assignment vulnerability (CVE-2026-2931, CVSS 8.8): its "update my booking profile" endpoint accepted a client-supplied field linking the booking record to a WordPress user id, with no check that it still pointed at the requester's own account -- letting a low-privileged customer reset the password of *any* WordPress user, including an administrator. This plugin closes that vulnerability class by construction:
+A serious risk in booking plugins is authenticated IDOR/mass-assignment: an "update my booking profile" endpoint that accepts a client-supplied field linking the booking record to a WordPress user id, with no check that it still points at the requester's own account, lets a low-privileged customer take over any WordPress user, including an administrator. This plugin closes that vulnerability class by construction:
 
 * A booking's owner is written in exactly one place -- at order completion, from the order's own customer id -- and never again. There is no "update booking" code path anywhere in this plugin that accepts a customer id, user id, or any similar field from a request.
 * This plugin never touches a WordPress password. There is no code path here that calls `wp_set_password()` or anything like it, at all -- a customer's password remains entirely WordPress core's own Account Details screen.

@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 /**
  * Claims one booking slot per bookable line item the moment an order is marked completed.
  * customer_id is set here, once, from $order->get_customer_id() -- never from any request
- * field -- see class-hdba-repository.php's class docblock for the full CVE-2026-2931 story.
+ * field -- see class-hdba-repository.php's class docblock for why.
  * Idempotent by construction: guarded by an order-level meta flag and, as a hard backstop,
  * the UNIQUE KEY on order_item_id in the bookings table.
  */

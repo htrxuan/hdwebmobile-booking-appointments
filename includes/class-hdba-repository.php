@@ -7,12 +7,11 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Closes CVE-2026-2931 (CVSS 8.8, authenticated IDOR/mass-assignment in a competing booking
- * plugin) by construction. That plugin let a low-privileged customer reset ANY WordPress
- * user's password -- including an administrator's -- because its "update my booking profile"
- * endpoint accepted a client-supplied `externalId` field that was trusted as the WordPress
- * user id to sync the password onto, with no check that it still pointed at the requester's
- * own account.
+ * Guards against authenticated IDOR/mass-assignment by construction. The risk: an "update my
+ * booking profile" endpoint that accepts a client-supplied user id field and trusts it as the
+ * WordPress account to sync data (or a password) onto would let a low-privileged customer
+ * take over ANY account -- including an administrator's -- with no check that the id still
+ * points at the requester's own account.
  *
  * This plugin has no equivalent field, ever. `customer_id` on a booking row is written in
  * exactly ONE place -- claim_slot() below, called only from class-hdba-order.php's order-
@@ -24,8 +23,7 @@ if (!defined('ABSPATH')) {
  * a customer's password is WordPress core's own Account Details screen, full stop.
  *
  * claim_slot() is also the fix for the separate "overbooking via a race condition" class of
- * bug (the same shape as CVE-2026-1932's missing-authorization-on-a-status-update-endpoint,
- * generalized to capacity): claiming a slot means inserting at the first free slot_index in
+ * bug: claiming a slot means inserting at the first free slot_index in
  * [0, capacity) for that exact (product, date, time), and the UNIQUE KEY on (product_id,
  * booking_date, time_slot, slot_index) means two concurrent claims can never both succeed at
  * the same index -- the loser's INSERT fails and the caller retries at the next index or gives
